@@ -1,0 +1,1246 @@
+---
+title: "Inserimento_Laureati"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+```
+
+```{r setup, include=FALSE}
+#CARICAMENTO DEL DATASET
+InsProLau_Microdati_Anno_2015 <- read.delim("~/Desktop/Data science/Progetto R/InsProLau_2015_IT_TXT/InsProLau_Microdati_Anno_2015.txt")
+```
+
+
+
+```{r setup, include=FALSE}
+#vengono selezionati solo alcuni attributi del campione
+InserimentoLau1=InsProLau_Microdati_Anno_2015[c(4,6,11,26,27,28,29,30,32,38,39,40,41,42,44,45,46,47,48,49,50,51                               ,52,54,55,56,57,58,59,60,61,63,64,66,67,68,69,71,72,75,77,78,79,80,81,82,84,85,87,88,90,94,95,96,97,98,109,110,111,112,113,114,115,117,118,119,120,130,134,137,150,158,171,172,173,174,176,178)]
+
+
+```
+
+
+```{r setup, include=F}
+#Verifico la presenza di missing values nelle colonne relative al corso di laurea e al voto di laurea
+library(Amelia)
+missmap(InserimentoLau1[1],col=c("red","lightblue"),x.cex = 0.3)
+
+missmap(InserimentoLau1[9],col=c("red","lightblue"),x.cex = 0.3)
+
+```
+
+
+
+
+```{r setup, include=F}
+#il corso di laurea contiene solo il 2% di missing quindi decido di eliminarne le relative osservazioni mentre il voto di laurea non contiene alcun missing
+InserimentoLau2=InserimentoLau1[complete.cases(InserimentoLau1[ , 1]),]
+
+```
+
+
+
+```{r setup, include=F}
+library(dplyr)
+#divisione del dataset in subsets in funzione del corso di laurea
+Scientifico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 1),c(1:78))
+Chimico_Faramceutico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 2),c(1:78))
+Geo_Biologico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 3),c(1:78))
+Medico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 4),c(1:78))
+Ingegneria <- select(filter(InserimentoLau2, GRUPPO_mIcro == 5),c(1:78))
+Architettura <- select(filter(InserimentoLau2, GRUPPO_mIcro == 6),c(1:78))
+Agrario <- select(filter(InserimentoLau2, GRUPPO_mIcro == 7),c(1:78))
+Economico_Statistico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 8),c(1:78))
+Politico_Sociale <- select(filter(InserimentoLau2, GRUPPO_mIcro == 9),c(1:78))
+Giuridico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 10),c(1:78))
+Letterario <- select(filter(InserimentoLau2, GRUPPO_mIcro == 11),c(1:78))
+Linguistico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 12),c(1:78))
+Insegnamento <- select(filter(InserimentoLau2, GRUPPO_mIcro == 13),c(1:78))
+Psicologico <- select(filter(InserimentoLau2, GRUPPO_mIcro == 14),c(1:78))
+EducazioneFisica <- select(filter(InserimentoLau2, GRUPPO_mIcro == 15),c(1:78))
+Difesa_Sicurezza <- select(filter(InserimentoLau2, GRUPPO_mIcro == 16),c(1:78))
+
+```
+
+
+```{r setup, include=F}
+#sostituiamo i numeri con il loro corrispettivo corso di laurea
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "1","Scientifico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "2","Chimico_Farmaceutico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "3","Geo_Biologico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "4","Medico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "5","Ingegneria")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "6","Architettura")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "7","Agrario")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "8","Economico_Statistico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "9","Politico_Sociale")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "10","Giuridico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "11","Letterario")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "12","Linguistico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "13","Insegnamento")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "14","Psicologico")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "15","EducazioneFisica")
+InserimentoLau2$GRUPPO_mIcro=replace(InserimentoLau2$GRUPPO_mIcro,InserimentoLau2$GRUPPO_mIcro == "16","Difesa_e_Sicurezza")
+```
+
+
+```{r setup, include=T}
+#CALCOLO MEDIA ARITMETICA E VARIANZA VISUALIZZATE MEDIANTE VETTORE CON CORRISPETTIVI PLOT E ISTOGRAMMI
+mediavotilaurea <- c(mean(Agrario$L1_22), mean(Architettura$L1_22), mean(Chimico_Faramceutico$L1_22), mean(Economico_Statistico$L1_22), mean(EducazioneFisica$L1_22), mean(Giuridico$L1_22), mean(Geo_Biologico$L1_22), mean(Ingegneria$L1_22), mean(Insegnamento$L1_22), mean(Letterario$L1_22), mean(Linguistico$L1_22), mean(Medico$L1_22), mean(Politico_Sociale$L1_22), mean(Psicologico$L1_22), mean(Scientifico$L1_22), mean(Difesa_Sicurezza$L1_22))
+round(mediavotilaurea, digits = 0)
+
+
+varianzavotilaurea <- c(var(Agrario$L1_22), var(Architettura$L1_22), var(Chimico_Faramceutico$L1_22), var(Economico_Statistico$L1_22), var(EducazioneFisica$L1_22), var(Giuridico$L1_22), var(Geo_Biologico$L1_22), var(Ingegneria$L1_22), var(Insegnamento$L1_22), var(Letterario$L1_22), var(Linguistico$L1_22), var(Medico$L1_22), var(Politico_Sociale$L1_22), var(Psicologico$L1_22), var(Scientifico$L1_22), var(Difesa_Sicurezza$L1_22))
+
+#plot(varianzavotilaurea)
+
+#SCARTO QUADRATICO MEDIO 
+scartoquadraticomediovotilaurea <- c(sd(Agrario$L1_22, na.rm=TRUE), sd(Architettura$L1_22, na.rm=TRUE), sd(Chimico_Faramceutico$L1_22, na.rm=TRUE), sd(Economico_Statistico$L1_22, na.rm=TRUE), sd(EducazioneFisica$L1_22, na.rm=TRUE), sd(Giuridico$L1_22, na.rm=TRUE), sd(Geo_Biologico$L1_22, na.rm=TRUE), sd(Ingegneria$L1_22, na.rm=TRUE), sd(Insegnamento$L1_22, na.rm=TRUE), sd(Letterario$L1_22, na.rm=TRUE), sd(Linguistico$L1_22, na.rm=TRUE), sd(Medico$L1_22, na.rm=TRUE), sd(Politico_Sociale$L1_22, na.rm=TRUE), sd(Psicologico$L1_22, na.rm=TRUE), sd(Scientifico$L1_22, na.rm=TRUE), sd(Difesa_Sicurezza$L1_22, na.rm=TRUE))
+
+scartoquadraticomediovotilaurea
+
+CorsoPerAD=c("Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico","Difesa e sicurezza")
+PlotMedia <- data.frame(CorsoPerAD,round(mediavotilaurea, digits = 0))
+PlotVar <- data.frame(CorsoPerAD,varianzavotilaurea)
+PlotSQM <-data.frame(CorsoPerAD,scartoquadraticomediovotilaurea)
+
+
+ggplot(PlotMedia, aes(x=reorder(CorsoPerAD, -mediavotilaurea), y=mediavotilaurea)) + 
+  geom_point(size=2) + 
+  geom_segment(aes(x=CorsoPerAD, 
+                   xend=CorsoPerAD, 
+                   y=97, 
+                   yend=mediavotilaurea)) + 
+  labs(title="Media dei voti di Laurea per corso di studi") + 
+geom_point( size=2, color="Blue") +
+  theme(axis.text.x = element_text(angle=90, vjust=0.1)) +xlab("Corso di Laurea") +
+  ylab("Votazione")
+
+ggplot(PlotMedia, aes(x=reorder(CorsoPerAD, -round(mediavotilaurea, digits = 0)), y=round(mediavotilaurea, digits = 0), label=round(mediavotilaurea, digits = 0))) + 
+  geom_point(fill="blue", size=10)  +
+  geom_segment(aes(y =103, 
+                   x = CorsoPerAD, 
+                   yend = round(mediavotilaurea, digits = 0), 
+                   xend = CorsoPerAD), 
+               color = "Black") +
+  geom_text(color="white", size=4) +
+  labs(title="Media dei voti di Laurea per corso di studi") + 
+  ylim(97, 110)  +xlab("Corso di Laurea") +
+  ylab("Voto di laurea")+
+  coord_flip()
+
+
+
+
+
+
+ggplot(PlotSQM) +
+  geom_bar( aes(x=reorder(CorsoPerAD, -scartoquadraticomediovotilaurea), y=mediavotilaurea), stat="identity", fill="forestgreen", alpha=0.5) +
+  geom_errorbar( aes(x=CorsoPerAD, ymin=mediavotilaurea-scartoquadraticomediovotilaurea, ymax=mediavotilaurea+scartoquadraticomediovotilaurea), width=0.4, colour="orange", alpha=0.9, size=1.5) +
+  ggtitle("using standard deviation") +  coord_cartesian(ylim = c(85, 120))+
+  theme(axis.text.x = element_text(angle=90, vjust=0.6)) +xlab("Corso di Laurea") +
+  ylab("Voto di laurea") + annotate("text", x = "Economico-Statistico", y = 111, label = "±8.893",size=4)+ annotate("text", x = "Geo-Biologico", y = 109, label = "±8.767",size=4)+ annotate("text", x = "Ingegneria", y = 112, label = "±8.263",size=4)+ annotate("text", x = "Scientifico", y = 113, label = "±7.995",size=4)+annotate("text", x = "Chimico-Farmaceutico", y = 112, label = "±7.992",size=4)+annotate("text", x ="Educazione Fisica", y = 110, label = "±7.692",size=4)+annotate("text", x = "Politico-Sociale", y = 112, label = "±7.434",size=4)+annotate("text", x = "Difesa e sicurezza", y = 110, label = "±7.210",size=4)+annotate("text", x = "Psicologico", y = 112, label = "±7.116",size=4)+annotate("text", x = "Agrario", y = 113, label = "±7.104",size=4)+annotate("text", x = "Giuridico", y = 114, label = "±7.043",size=4)+annotate("text", x = "Medico", y = 114, label = "±6.754",size=4)+annotate("text", x = "Insegnamento", y = 112, label = "±6.376",size=4)+annotate("text", x = "Architettura", y = 112, label = "±6.376",size=4)+annotate("text", x = "Linguistico", y = 113, label = "±6.323",size=4)+annotate("text", x = "Letterario", y = 115, label = "±5.150",size=4) 
+```
+
+```{r setup, include=TRUE}
+#CALCOLO DELLA PERCENTUALE DEL SESSO PER OGNI CAMPIONE DI CLASSE DI LAUREA 
+sessoAgrario <-table(Agrario$sesso==1)
+sessoAgrario/sum(sessoAgrario)*100
+
+sessoArchitettura <- table(Architettura$sesso==1)
+sessoArchitettura/sum(sessoArchitettura)*100
+
+sessoChimicofarmaceutico <- table(Chimico_Faramceutico$sesso==1)
+sessoChimicofarmaceutico/sum(sessoChimicofarmaceutico)*100
+
+sessoEconimico_statistico<-table(Economico_Statistico$sesso==1)
+sessoEconimico_statistico/sum(sessoEconimico_statistico)*100
+
+sessoEducazionefisica<-table(EducazioneFisica$sesso==1)
+sessoEducazionefisica/sum(sessoEducazionefisica)*100
+
+sessoGeobiologico<-table(Geo_Biologico$sesso==1)
+sessoGeobiologico/sum(sessoGeobiologico)*100
+
+sessoGiuridico<-table(Giuridico$sesso==1)
+sessoGiuridico/sum(sessoGiuridico)*100
+
+sessoIngegneria<-table(Ingegneria$sesso==1)
+sessoIngegneria/sum(sessoIngegneria)*100
+
+sessoInsegnamento<-table(Insegnamento$sesso==1)
+sessoInsegnamento/sum(sessoInsegnamento)*100
+
+sessoLetterario<-table(Letterario$sesso==1)
+sessoLetterario/sum(sessoLetterario)*100
+
+sessoLinguistico<-table(Linguistico$sesso==1)
+sessoLinguistico/sum(sessoLinguistico)*100
+
+sessoMedico<-table(Medico$sesso==1)
+sessoMedico/sum(sessoMedico)*100
+
+sessoPoliticosociale<-table(Politico_Sociale$sesso==1)
+sessoPoliticosociale/sum(sessoPoliticosociale)*100
+
+sessoPsicologico<-table(Psicologico$sesso==1)
+sessoPsicologico/sum(sessoPsicologico)*100
+
+sessoScientifico<-table(Scientifico$sesso==1)
+sessoScientifico/sum(sessoScientifico)*100
+
+sessodifesa <- table(Difesa_Sicurezza$sesso==1)
+sessodifesa/sum(sessodifesa)*100
+
+cols <- c("pink", "blue")
+labs <- c("donna", "uomo")
+
+#RAPPRESENTAZIONE DELLA VARIABILE "SESSO" MEDIANTE GRAFICO A TORTA
+pie(sessoAgrario, labels=labs, col=cols)
+pie(sessoArchitettura, labels=labs, col=cols)
+pie(sessoChimicofarmaceutico, labels=labs, col=cols)
+pie(sessoEconimico_statistico, labels=labs, col=cols)
+pie(sessoEducazionefisica, labels=labs, col=cols)
+pie(sessoGeobiologico, labels=labs, col=cols)
+pie(sessoGiuridico, labels=labs, col=cols)
+pie(sessoIngegneria, labels=labs, col=cols)
+pie(sessoInsegnamento, labels=labs, col=cols)
+pie(sessoLetterario, labels=labs, col=cols)
+pie(sessoLinguistico, labels=labs, col=cols)
+pie(sessoMedico, labels=labs, col=cols)
+pie(sessoPoliticosociale, labels=labs, col=cols)
+pie(sessoPsicologico, labels=labs, col=cols)
+pie(sessoScientifico, labels=labs, col=cols)
+pie(sessodifesa, labels=labs, col=cols)
+```
+
+```{r setup, include=T}
+#CALCOLO DELLA MODA RELATIVA AL VOTO DI LAUREA PER OGNI FACOLTA'.
+table(Agrario$L1_22)
+table(Architettura$L1_22)
+table(Chimico_Faramceutico$L1_22) 
+table(Economico_Statistico$L1_22) 
+table(EducazioneFisica$L1_22)
+table(Geo_Biologico$L1_22)
+table(Ingegneria$L1_22)
+table(Insegnamento$L1_22)
+table(Letterario$L1_22)
+table(Medico$L1_22)
+table(Politico_Sociale$L1_22)
+table(Psicologico$L1_22)
+table(Scientifico$L1_22)
+table(Difesa_Sicurezza$L1_22)
+```
+
+
+```{r setup, include=TRUE}
+#RAPPRESENTAZIONE GRAFICA DISTRIBUZIONE DEI VOTI LAUREA
+Ag2 <- Agrario$L1_22
+plot(table(Ag2))
+Ar2 <- Architettura$L1_22
+plot(table(Ar2))
+Chi2 <- Chimico_Faramceutico$L1_22
+plot(table(Chi2))
+Geo2 <- Geo_Biologico$L1_22
+plot(table(Geo2))
+Giu2 <- Giuridico$L1_22
+plot(table(Giu2))
+Ed2 <- EducazioneFisica$L1_22
+plot(table(Ed2))
+Eco2 <- Economico_Statistico$L1_22
+plot(table(Eco2))
+Ing2 <- Ingegneria$L1_22
+plot(table(Ing2))
+Ins2 <- Insegnamento$L1_22
+plot(table(Ins2))
+Let2 <- Letterario$L1_22
+plot(table(Let2))
+Med2 <- Medico$L1_22
+plot(table(Med2))
+Pol2 <- Politico_Sociale$L1_22
+plot(table(Pol2))
+Psi2 <- Psicologico$L1_22
+plot(table(Psi2))
+Sci <- Scientifico$L1_22
+plot(table(Sci))
+dif2 <- Difesa_Sicurezza$L1_22
+plot(table(dif2))
+
+```
+
+```{r setup, include=TRUE}
+#DISTRIBUZIONE DELLA POPOLAZIONE SECONDO LA VARIABILE DEL REDDITO (REDDITO_MFR)
+Geo <- Geo_Biologico$REDDITO_MFR
+plot(table(Geo))
+Psi <- Psicologico$REDDITO_MFR
+plot(table(Psi))
+Chi <- Chimico_Faramceutico$REDDITO_MFR
+plot(table(Chi))
+Ed <- EducazioneFisica$REDDITO_MFR
+plot(table(Ed))
+Ins <- Insegnamento$REDDITO_MFR
+plot(table(Ins))
+Lin <- Linguistico$REDDITO_MFR
+plot(table(Lin))
+Let <- Letterario$REDDITO_MFR
+plot(table(Let))
+Giu <- Giuridico$REDDITO_MFR
+plot(table(Giu))
+Pol <- Politico_Sociale$REDDITO_MFR
+plot(table(Pol))
+Eco <- Economico_Statistico$REDDITO_MFR
+plot(table(Eco))
+Ag <- Agrario$REDDITO_MFR
+plot(table(Ag))
+Arc <- Architettura$REDDITO_MFR
+plot(table(Arc))
+Med <- Medico$REDDITO_MFR
+plot(table(Med))
+Ing <- Ingegneria$REDDITO_MFR
+plot(table(Ing))
+difsic <- Difesa_Sicurezza$REDDITO_MFR
+plot(table(difsic))
+
+
+```
+
+```{r setup, include=TRUE}
+#DISTRIBUZIONE DELLA POPOLAZIONE SECONDO LA VARIABILE DUARATA STUDI (durata_studi)
+Geodur <- Geo_Biologico$durata_studi
+plot(table(Geodur))
+Psidur <- Psicologico$durata_studi
+plot(table(Psidur))
+Chidur <- Chimico_Faramceutico$durata_studi
+plot(table(Chidur))
+Eddur <- EducazioneFisica$durata_studi
+plot(table(Eddur))
+Insdur <- Insegnamento$durata_studi
+plot(table(Insdur))
+Lindur <- Linguistico$durata_studi
+plot(table(Lindur))
+Letdur <- Letterario$durata_studi
+plot(table(Letdur))
+Giudur <- Giuridico$durata_studi
+plot(table(Giudur))
+Poldur <- Politico_Sociale$durata_studi
+plot(table(Poldur))
+Ecodur <- Economico_Statistico$durata_studi
+plot(table(Ecodur))
+Agdur <- Agrario$durata_studi
+plot(table(Agdur))
+Arcdur <- Architettura$durata_studi
+plot(table(Arcdur))
+Meddur <- Medico$durata_studi
+plot(table(Meddur))
+Ingdur <- Ingegneria$durata_studi
+plot(table(Ingdur))
+difsicdur <- Difesa_Sicurezza$durata_studi
+plot(table(difsicdur))
+
+```
+
+RAPPRESENTAZIONE BOXPLOT DELLA VARIABILE REDDITO 
+```{r, fig.height=6, fig.width=12}
+#BOXPLOT PER LA VARIABILE REDDITO
+
+library(ggplot2)
+
+boxreddito=InserimentoLau2[complete.cases(InserimentoLau2[, 73]),]
+
+
+ggplot(boxreddito, aes(x=reorder(boxreddito$GRUPPO_mIcro, -boxreddito$REDDITO_MFR), y=boxreddito$REDDITO_MFR , fill=boxreddito$GRUPPO_mIcro, group=boxreddito$GRUPPO_mIcro)) + geom_boxplot() + 
+  ggtitle("Reddito per corso di laurea") + xlab("Corso di Laurea") +
+  ylab("Reddito") + 
+  theme(plot.title = element_text(size=15, face="bold", hjust=0.5),
+        axis.title = element_text(size=12, face="bold"), 
+        axis.text.x = element_text(size=10, angle=90),legend.position = "null")+
+  coord_cartesian(ylim=c(0,4500)) 
+
+                                
+```
+
+```{r}
+#Correlazione tra Voto Diploma e Voto di Laurea
+cor.test(Agrario$L1_22, Agrario$voto_diploma_it) #debole
+cor.test(Architettura$L1_22,Architettura$voto_diploma_it) #moderata 
+cor.test(Chimico_Faramceutico$L1_22, Chimico_Faramceutico$voto_diploma_it)#moderata
+cor.test(Economico_Statistico$L1_22, Economico_Statistico$voto_diploma_it)#moderata 
+cor.test(EducazioneFisica$L1_22, EducazioneFisica$voto_diploma_it)#debole 
+cor.test(Geo_Biologico$L1_22, Geo_Biologico$voto_diploma_it)#moderata 
+cor.test(Giuridico$L1_22, Giuridico$voto_diploma_it)#moderata 
+cor.test(Ingegneria$L1_22, Ingegneria$voto_diploma_it)#moderata 
+cor.test(Insegnamento$L1_22, Insegnamento$voto_diploma_it)#debole
+cor.test(Letterario$L1_22, Letterario$voto_diploma_it)#moderata
+cor.test(Linguistico$L1_22, Linguistico$voto_diploma_it)#moderata 
+cor.test(Medico$L1_22, Medico$voto_diploma_it)#moderata
+cor.test(Politico_Sociale$L1_22, Politico_Sociale$voto_diploma_it)#moderata
+cor.test(Psicologico$L1_22, Psicologico$voto_diploma_it)#moderata
+cor.test(Scientifico$L1_22, Scientifico$voto_diploma_it)#moderata
+cor.test(Difesa_Sicurezza$L1_22, Difesa_Sicurezza$voto_diploma_it)#debole 
+```
+
+
+```{r}
+#Correlazione tra tempo impiegato per laurearsi e mesi intercorrenti dalla laurea al primo lavoro/opportunità
+cor.test(Agrario$durata_studi, Agrario$mesi_I_lavoro)#bassa
+cor.test(Architettura$durata_studi,Architettura$mesi_I_lavoro)#negativa
+cor.test(Chimico_Faramceutico$durata_studi, Chimico_Faramceutico$mesi_I_lavoro)#negativa
+cor.test(Economico_Statistico$durata_studi, Economico_Statistico$mesi_I_lavoro)#negativa
+cor.test(EducazioneFisica$durata_studi, EducazioneFisica$mesi_I_lavoro)#negativa
+cor.test(Geo_Biologico$durata_studi, Geo_Biologico$mesi_I_lavoro)#negativa
+cor.test(Giuridico$durata_studi, Giuridico$mesi_I_lavoro)#negativa
+cor.test(Ingegneria$durata_studi, Ingegneria$mesi_I_lavoro)#negativa
+cor.test(Insegnamento$durata_studi, Insegnamento$mesi_I_lavoro)#negativa
+cor.test(Letterario$durata_studi, Letterario$mesi_I_lavoro)#negativa
+cor.test(Linguistico$durata_studi, Linguistico$mesi_I_lavoro)#negativa
+cor.test(Medico$durata_studi, Medico$mesi_I_lavoro)#bassa
+cor.test(Politico_Sociale$durata_studi, Politico_Sociale$mesi_I_lavoro)#negativa
+cor.test(Psicologico$durata_studi, Psicologico$mesi_I_lavoro)#negativa
+cor.test(Scientifico$durata_studi, Scientifico$mesi_I_lavoro)#negativa
+cor.test(Difesa_Sicurezza$durata_studi, Difesa_Sicurezza$mesi_I_lavoro)#bassa
+```
+
+```{r}
+#Correlazione tra Reddito e Voto di Laurea
+cor.test(Agrario$REDDITO_MFR, Agrario$L1_22) #bassa
+cor.test(Architettura$REDDITO_MFR,Architettura$L1_22) #bassa
+cor.test(Chimico_Faramceutico$REDDITO_MFR, Chimico_Faramceutico$L1_22) #bassa
+cor.test(Economico_Statistico$REDDITO_MFR, Economico_Statistico$L1_22) #bassa
+cor.test(EducazioneFisica$REDDITO_MFR, EducazioneFisica$L1_22) #bassa
+cor.test(Geo_Biologico$REDDITO_MFR, Geo_Biologico$L1_22) #bassa
+cor.test(Giuridico$REDDITO_MFR, Giuridico$L1_22) #negativa
+cor.test(Ingegneria$REDDITO_MFR, Ingegneria$L1_22) #bassa
+cor.test(Insegnamento$REDDITO_MFR, Insegnamento$L1_22) #bassa
+cor.test(Letterario$REDDITO_MFR, Letterario$L1_22)#bassa
+cor.test(Linguistico$REDDITO_MFR, Linguistico$L1_22)#bassa
+cor.test(Medico$REDDITO_MFR, Medico$L1_22)#bassa
+cor.test(Politico_Sociale$REDDITO_MFR, Politico_Sociale$L1_22)#bassa
+cor.test(Psicologico$REDDITO_MFR, Psicologico$L1_22)#negativo
+cor.test(Scientifico$REDDITO_MFR, Scientifico$L1_22)#bassa
+cor.test(Difesa_Sicurezza$REDDITO_MFR, Difesa_Sicurezza$L1_22)#bassa
+```
+
+
+```{r}
+#Correlazione tra Durata studi e Reddito
+cor.test(Agrario$durata_studi, Agrario$REDDITO_MFR)#negativa
+cor.test(Architettura$durata_studi,Architettura$REDDITO_MFR)#negativa
+cor.test(Chimico_Faramceutico$durata_studi, Chimico_Faramceutico$REDDITO_MFR)#bassa
+cor.test(Economico_Statistico$durata_studi, Economico_Statistico$REDDITO_MFR)#negativa
+cor.test(EducazioneFisica$durata_studi, EducazioneFisica$REDDITO_MFR)#negativa
+cor.test(Geo_Biologico$durata_studi, Geo_Biologico$REDDITO_MFR)#negativa
+cor.test(Giuridico$durata_studi, Giuridico$REDDITO_MFR)#negativa
+cor.test(Ingegneria$durata_studi, Ingegneria$REDDITO_MFR)#negativa
+cor.test(Insegnamento$durata_studi, Insegnamento$REDDITO_MFR)#bassa
+cor.test(Letterario$durata_studi, Letterario$REDDITO_MFR)#bassa
+cor.test(Linguistico$durata_studi, Linguistico$REDDITO_MFR)#bassa
+cor.test(Medico$durata_studi, Medico$REDDITO_MFR)#bassa
+cor.test(Politico_Sociale$durata_studi, Politico_Sociale$REDDITO_MFR)#bassa
+cor.test(Psicologico$durata_studi, Psicologico$REDDITO_MFR)#bassa
+cor.test(Scientifico$durata_studi, Scientifico$REDDITO_MFR)#negativa
+cor.test(Difesa_Sicurezza$durata_studi, Difesa_Sicurezza$REDDITO_MFR)#bassa
+```
+
+```{r setup, include=TRUE}
+#CALCOLATA CORRELAZIONE TRA IL VOTO DI LAUREA E I MESI CHE INTERCORRONO TRA IL CONSEGUIMENTO DEL TITOLO E IL PRIMO IMPIEGO DOVE I MESI DI LAVORO SONO >=0 E NON -1, VALORE CHE INDICA CHE L'INDIVIDUO LAVORAVA DURANTE GLI STUDI
+eco_mesilavoro <- select(filter(Economico_Statistico, mesi_I_lavoro>=0), c(1:78))
+cor.test(eco_mesilavoro$L1_22, eco_mesilavoro$mesi_I_lavoro) #correlazione negativa
+scienze_mesilavoro <- select(filter(Scientifico, mesi_I_lavoro>=0), c(1:78))
+cor.test(scienze_mesilavoro$L1_22, scienze_mesilavoro$mesi_I_lavoro) #correlazione negativa
+psicologia_mesilavoro <- select(filter(Psicologico, mesi_I_lavoro>=0), c(1:78))
+cor.test(psicologia_mesilavoro$L1_22, psicologia_mesilavoro$mesi_I_lavoro) #correlazione negativa 
+agrario_mesilavoro <- select(filter(Agrario, mesi_I_lavoro>=0), c(1:78))
+cor.test(agrario_mesilavoro$L1_22, agrario_mesilavoro$mesi_I_lavoro) #correlazione negativa 
+architettura_mesilavoro <- select(filter(Architettura, mesi_I_lavoro>=0), c(1:78))
+cor.test(architettura_mesilavoro$L1_22, architettura_mesilavoro$mesi_I_lavoro)#correlazione negativa 
+chimicofar_mesilavoro <- select(filter(Chimico_Faramceutico, mesi_I_lavoro>=0), c(1:78))
+cor.test(chimicofar_mesilavoro$L1_22, chimicofar_mesilavoro$mesi_I_lavoro)#correlazione positiva ma bassa 
+geobio_mesilavoro <- select(filter(Geo_Biologico, mesi_I_lavoro>=0), c(1:78))
+cor.test(geobio_mesilavoro$L1_22, geobio_mesilavoro$mesi_I_lavoro) #correlazione negativa 
+giuridico_mesilavoro <- select(filter(Giuridico, mesi_I_lavoro>=0), c(1:78))
+cor.test(giuridico_mesilavoro$L1_22, giuridico_mesilavoro$mesi_I_lavoro) #correlazione positiva ma bassa
+ingegneria_mesilavoro <- select(filter(Ingegneria, mesi_I_lavoro>=0), c(1:78))
+cor.test(ingegneria_mesilavoro$L1_22, ingegneria_mesilavoro$mesi_I_lavoro) #correlazione negativa
+insegnamento_mesilavoro <- select(filter(Insegnamento, mesi_I_lavoro>=0), c(1:78))
+cor.test(insegnamento_mesilavoro$L1_22, insegnamento_mesilavoro$mesi_I_lavoro)#correlazione negativa 
+letterario_mesilavoro <- select(filter(Letterario, mesi_I_lavoro>=0), c(1:78))
+cor.test(letterario_mesilavoro$L1_22, letterario_mesilavoro$mesi_I_lavoro) #correlazione negativa
+linguistico_mesilavoro <- select(filter(Linguistico, mesi_I_lavoro>=0), c(1:78))
+cor.test(linguistico_mesilavoro$L1_22, linguistico_mesilavoro$mesi_I_lavoro) #correlazione negativa 
+medico_mesilavoro <- select(filter(Medico, mesi_I_lavoro>=0), c(1:78))
+cor.test(medico_mesilavoro$L1_22, medico_mesilavoro$mesi_I_lavoro) #correlazione positiva bassa 
+politicosociale_mesilavoro <- select(filter(Politico_Sociale, mesi_I_lavoro>=0), c(1:78))
+cor.test(politicosociale_mesilavoro$L1_22, politicosociale_mesilavoro$mesi_I_lavoro) #correlazione negativa 
+
+```
+
+```{r setup, include=T}
+#VIENE COSTRUITO UN CICLO FOR IN GRADO DI SELEZIONARE, PER OGNI CLASSE DI LAUREA, GLI INDIVIDUI CHE SVOLGEVANO UNA ATTIVITA' LAVORATIVA DURANTE IL PERIODO DI STUDI E DI CALCOLARNE IL TEMPO MEDIO SPESO PER TROVARE LAVORO. 
+#j=numero di persone che inzia a lavorare prima di laurearsi
+InserimentoLau2=InserimentoLau1[complete.cases(InserimentoLau1[ ,1]),]
+MesiLavoro=InserimentoLau2[complete.cases(InserimentoLau2[  ,77]),]
+
+i=0
+j=0
+somma=0
+for(tempo in MesiLavoro$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    j=j+1
+  }
+}
+media_tempo= somma/i
+
+#moltiplicare per avere numero di ore perse
+
+AgMesiDis=Agrario[complete.cases(Agrario[ , 77]),]
+
+i=0
+jAg=0
+somma=0
+for(tempo in AgMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jAg=jAg+1
+  }
+}
+
+media_tempo_Agrario= somma/i
+jAg
+ArMesiDis=Architettura[complete.cases(Architettura[ , 77]),]
+
+i=0
+jAr=0
+somma=0
+for(tempo in ArMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jAr=jAr+1
+  }
+}
+media_tempo_Arc= somma/i
+jAr
+CMesiDis=Chimico_Faramceutico[complete.cases(Chimico_Faramceutico[ , 77]),]
+
+i=0
+jCh=0
+somma=0
+for(tempo in CMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jCh=jCh+1
+  }
+}
+media_tempo_Chimico_faramceutico= somma/i
+jCh
+EcoMesiDis=Economico_Statistico[complete.cases(Economico_Statistico[ , 77]),]
+
+i=0
+jec=0
+somma=0
+for(tempo in EcoMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jec=jec+1
+  }
+}
+media_tempo_Economico_statistico= somma/i
+jec
+EdMesiDis=EducazioneFisica[complete.cases(EducazioneFisica[ , 77]),]
+
+i=0
+jEd=0
+somma=0
+for(tempo in EdMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jEd=jEd+1
+  }
+}
+media_tempo_Ed1= somma/i
+jEd
+GeoMesiDis=Geo_Biologico[complete.cases(Geo_Biologico[ , 77]),]
+
+i=0
+jgeo=0
+somma=0
+for(tempo in GeoMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jgeo=jgeo+1
+  }
+}
+media_tempo_Geo_biologico= somma/i
+jgeo
+GiuMesiDis=Giuridico[complete.cases(Giuridico[ , 77]),]
+
+i=0
+jgiu=0
+somma=0
+for(tempo in GiuMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jgiu=jgiu+1
+  }
+}
+media_tempo_Giuridico= somma/i
+jgiu
+IngMesiDis=Ingegneria[complete.cases(Ingegneria[ , 77]),]
+
+i=0
+jIng=0
+somma=0
+for(tempo in IngMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jIng=jIng+1
+  }
+}
+media_tempo_Ingegneria= somma/i
+jIng
+InsMesiDis=Insegnamento[complete.cases(Insegnamento[ , 77]),]
+
+i=0
+jins=0
+somma=0
+for(tempo in InsMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jins=jins+1
+  }
+}
+media_tempo_Insegnamento= somma/i
+
+LetMesiDis=Letterario[complete.cases(Letterario[ , 77]),]
+
+i=0
+jlet=0
+somma=0
+for(tempo in LetMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jlet=jlet+1
+  }
+}
+media_tempo_Letterario= somma/i
+jlet
+LinMesiDis=Linguistico[complete.cases(Linguistico[ , 77]),]
+
+i=0
+jlin=0
+somma=0
+for(tempo in LinMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jlin=jlin+1
+  }
+}
+media_tempo_Linguistico= somma/i
+jlin
+MMesiDis=Medico[complete.cases(Medico[ , 77]),]
+
+i=0
+jmed=0
+somma=0
+for(tempo in MMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jmed=jmed+1
+  }
+}
+media_tempo_Medico= somma/i
+jmed
+PolMesiDis=Politico_Sociale[complete.cases(Politico_Sociale[ , 77]),]
+
+i=0
+jpol=0
+somma=0
+for(tempo in PolMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jpol=jpol+1
+  }
+}
+media_tempo_Politico_sociale= somma/i
+jpol
+PsiMesiDis=Psicologico[complete.cases(Psicologico[ , 77]),]
+
+i=0
+jpsi=0
+somma=0
+for(tempo in PsiMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jpsi=jpsi+1
+  }
+}
+media_tempo_Psicologico= somma/i
+
+SMesiDis=Scientifico[complete.cases(Scientifico[ , 77]),]
+
+i=0
+jsci=0
+somma=0
+for(tempo in SMesiDis$mesi_I_lavoro){
+  if(tempo != -1){
+    i=i+1
+    somma=somma + tempo
+  }
+  else if(tempo==-1){
+    jsci=jsci+1
+  }
+}
+media_tempo_S1= somma/i
+
+
+```
+
+
+```{r setup, include=F}
+#PROPORZIONI PER CLASSE DI LAUREA PER OGNI CLASSE DI LAUREA POST TRIENNALE: L1_32A MASTER PRIMO LIVELLO(2=si e concluso, 4=NO), L1_32C MAGISTRALE(2=SI e concluso, 4=NO), L1_36E STAGE(1=SI, 4=NO). Si prendono in considerazione le classi di laurea di: agraria, economia, giurisprudenza, ingegneria, lettere, politico sociale. 
+#PROPORZIONI PER CLASSE DI LAUREA PER OGNI CLASSE DI LAUREA POST TRIENNALE e GRAFICO
+posttriennaleAgraria1<-table(Agrario$L1_32A==2)
+posttriennaleAgraria1/sum(posttriennaleAgraria1)*100
+#il 4.9% continua gli studi e conclude con un master di primo livello
+posttriennaleAgraria2<-table(Agrario$L1_32C==2)
+posttriennaleAgraria2/sum(posttriennaleAgraria2)*100
+#il 17.62% continua gli studi e conclude con una laurea magistrale 
+posttriennaleAgraria3<-table(Agrario$L1_36E==1)
+posttriennaleAgraria3/sum(posttriennaleAgraria3)*100
+#il 1.14% svolge con uno stage 
+
+
+posttriennaleArchitettura1<-table(Architettura$L1_32A==2)
+posttriennaleArchitettura1/sum(posttriennaleArchitettura1)*100
+#il 6.18% continua gli studi e conclude con un master di primo livello
+posttriennaleArchitettura2<-table(Architettura$L1_32C==2)
+posttriennaleArchitettura2/sum(posttriennaleArchitettura2)*100
+#il 19.84% continua gli studi e conclude con una laurea magistrale 
+posttriennaleArchitettura3<-table(Architettura$L1_36E==1)
+posttriennaleArchitettura3/sum(posttriennaleArchitettura3)*100
+#il 1.06% svolge con uno stage 
+
+posttriennaleChiFar1<-table(Chimico_Faramceutico$L1_32A==2)
+posttriennaleChiFar1/sum(posttriennaleChiFar1)*100
+#il 3.88% continua gli studi e conclude con un master di primo livello
+posttriennaleChiFar2<-table(Chimico_Faramceutico$L1_32C==2)
+posttriennaleChiFar2/sum(posttriennaleChiFar2)*100
+#il 17.04% continua gli studi e conclude con una laurea magistrale 
+posttriennaleChiFar3<-table(Chimico_Faramceutico$L1_36E==1)
+posttriennaleChiFar3/sum(posttriennaleChiFar3)*100
+#il 1.38% svolge con uno stage 
+
+
+posttriennaleEcostat1<-table(Economico_Statistico$L1_32A==2)
+posttriennaleEcostat1/sum(posttriennaleEcostat1)*100
+#il 5.72% continua gli studi e conclude con un master di primo livello 
+posttriennaleEcostat2<-table(Economico_Statistico$L1_32C==2)
+posttriennaleEcostat2/sum(posttriennaleEcostat2)*100
+#il 26,26% continua gli studi e conclude con una magistrale
+posttriennaleEcostat3<-table(Economico_Statistico$L1_36E==1)
+posttriennaleEcostat3/sum(posttriennaleEcostat3)*100
+#il 1,77% svolge uno stage 
+
+
+posttriennaleEduFis1<-table(EducazioneFisica$L1_32A==2)
+posttriennaleEduFis1/sum(posttriennaleEduFis1)*100
+#il 8,9% continua gli studi e conclude con un master di primo livello  
+posttriennaleEduFis2<-table(EducazioneFisica$L1_32C==2)
+posttriennaleEduFis2/sum(posttriennaleEduFis2)*100
+#il 24.40% continua gli studi e conclude con una magistrale 
+posttriennaleEduFis3<-table(EducazioneFisica$L1_36E==1)
+posttriennaleEduFis3/sum(posttriennaleEduFis3)*100
+#il 0.66% svolge uno stage 
+
+posttriennaleGeoBio1<-table(Geo_Biologico$L1_32A==2)
+posttriennaleGeoBio1/sum(posttriennaleGeoBio1)*100
+#il 5.12% contiua gli studi e conclude con un master di primo livello
+posttriennaleGeoBio2<-table(Geo_Biologico$L1_32C==2)
+posttriennaleGeoBio2/sum(posttriennaleGeoBio2)*100
+#il 32.15% continua gli studi e conclude con una magistrale 
+posttriennaleGeoBio3<-table(Geo_Biologico$L1_36E==1)
+posttriennaleGeoBio3/sum(posttriennaleGeoBio3)*100
+#il 1,5% svolge uno stage  
+
+posttriennaleGiuridico1<-table(Giuridico$L1_32A==2)
+posttriennaleGiuridico1/sum(posttriennaleGiuridico1)*100
+#il 8.09% continua gli studi e conclude con un master di primo livello
+posttriennaleGiuridico2<-table(Giuridico$L1_32C==2)
+posttriennaleGiuridico2/sum(posttriennaleGiuridico2)*100
+#il 4.19% continua e conclude gli studi con una magistrale
+posttriennaleGiuridico3<-table(Giuridico$L1_36E==1)
+posttriennaleGiuridico3/sum(posttriennaleGiuridico3)*100
+#il 1,25% svolge uno stage  
+
+posttriennaleIngegneria1<-table(Ingegneria$L1_32A==2)
+posttriennaleIngegneria1/sum(posttriennaleIngegneria1)*100
+#il 3.68% continua gli studi e conclude con un master di primo livello
+posttriennaleIngegneria2<-table(Ingegneria$L1_32C==2)
+posttriennaleIngegneria2/sum(posttriennaleIngegneria2)*100
+#il 23.28% continua e conclude gli studi con una magistrale
+posttriennaleIngegneria3<-table(Ingegneria$L1_36E==1)
+posttriennaleIngegneria3/sum(posttriennaleIngegneria3)*100
+#il 1.48% svolge uno stage 
+
+
+posttriennaleInsegnamento1<-table(Insegnamento$L1_32A==2)
+posttriennaleInsegnamento1/sum(posttriennaleInsegnamento1)*100
+#il 19.42% continua gli studi e conclude con un master di primo livello
+posttriennaleInsegnamento2<-table(Insegnamento$L1_32C==2)
+posttriennaleInsegnamento2/sum(posttriennaleInsegnamento2)*100
+#il 9.09% continua e conclude gli studi con una magistrale
+posttriennaleInsegnamento3<-table(Insegnamento$L1_36E==1)
+posttriennaleInsegnamento3/sum(posttriennaleInsegnamento3*100)
+#il 1.61% svolge uno stage 
+
+posttriennaleletterario1<-table(Letterario$L1_32A==2)
+posttriennaleletterario1/sum(posttriennaleletterario1)*100
+#il 9,76% continua gli studi e conclude con un master di primo livello
+posttriennaleletterario2<-table(Letterario$L1_32C==2)
+posttriennaleletterario2/sum(posttriennaleletterario2)*100
+#il 21,56% continua e conclude gli studi con una magistrale
+posttriennaleletterario3<-table(Letterario$L1_36E==1)
+posttriennaleletterario3/sum(posttriennaleletterario3)*100
+#il 1,49% svolge uno stage 
+
+posttriennaleLinguistico1<-table(Linguistico$L1_32A==2)
+posttriennaleLinguistico1/sum(posttriennaleLinguistico1)*100
+#il 10.35% continua gli studi e conclude con un master di primo livello
+posttriennaleLinguistico2<-table(Linguistico$L1_32C==2)
+posttriennaleLinguistico2/sum(posttriennaleLinguistico2)*100
+#il 19.31% continua e conclude gli studi con una magistrale
+posttriennaleLinguistico3<-table(Linguistico$L1_36E==1)
+posttriennaleLinguistico3/sum(posttriennaleLinguistico3)*100
+#il 1% svolge uno stage 
+
+posttriennaleMedico1<-table(Medico$L1_32A==2)
+posttriennaleMedico1/sum(posttriennaleMedico1)*100
+#il 12.19% continua gli studi e conclude con un master di primo livello
+posttriennaleMedico2<-table(Medico$L1_32C==2)
+posttriennaleMedico2/sum(posttriennaleMedico2)*100
+#il 2.7% continua e conclude gli studi con una magistrale
+posttriennaleMedico3<-table(Medico$L1_36E==1)
+posttriennaleMedico3/sum(posttriennaleMedico3)*100
+#il 0.21% svolge uno stage
+
+
+posttriennalePoliticosociale1<-table(Politico_Sociale$L1_32A==2)
+posttriennalePoliticosociale1/sum(posttriennalePoliticosociale1)*100
+#il 11,02% continua gli studi e conlude con un master di primo livello 
+posttriennalePoliticosociale2<-table(Politico_Sociale$L1_32C==2)
+posttriennalePoliticosociale2/sum(posttriennalePoliticosociale2)*100
+#il 14,30% continua gli studi con una magistrale 
+posttriennalePoliticosociale3<-table(Politico_Sociale$L1_36E==1)
+posttriennalePoliticosociale3/sum(posttriennalePoliticosociale3)*100
+#il 1,29% svolge uno stage 
+
+posttriennalePsicologico1<-table(Psicologico$L1_32A==2)
+posttriennalePsicologico1/sum(posttriennalePsicologico1)*100
+#il 11.34% continua gli studi e conclude con un master di primo livello
+posttriennalePsicologico2<-table(Psicologico$L1_32C==2)
+posttriennalePsicologico2/sum(posttriennalePsicologico2)*100
+#il 30.01% continua e conclude gli studi con una magistrale
+posttriennalePsicologico3<-table(Psicologico$L1_36E==1)
+posttriennalePsicologico3/sum(posttriennalePsicologico3)*100
+#il 1.65% svolge uno stage
+
+posttriennaleScientifico1<-table(Scientifico$L1_32A==2)
+posttriennaleScientifico1/sum(posttriennaleScientifico1)*100
+#il 4.11% continua gli studi e conclude con un master di primo livello
+posttriennaleScientifico2<-table(Scientifico$L1_32C==2)
+posttriennaleScientifico2/sum(posttriennaleScientifico2)*100
+#il 25.25% continua e conclude gli studi con una magistrale
+posttriennaleScientifico3<-table(Scientifico$L1_36E==1)
+posttriennaleScientifico3/sum(posttriennaleScientifico3)*100
+#il 0.95% svolge uno stage
+```
+
+```{r,fig.height=6, fig.width=12}
+#GRAFICO PER PROSEGUO POST LAUREA
+library(ggplot2)
+library(fivethirtyeight)
+Tipologia_di_Laurea <- c(rep("Agrario" , 3) , rep("Architett" , 3) , rep("CF", 3),rep("Eco" , 3),rep("EF" , 3) ,rep("GB" , 3),rep("Giur" , 3) ,rep("Ing" , 3) ,rep("Ins" , 3),rep("Let", 3) ,rep("Lin" , 3) ,rep("Med" , 3),rep("PS" , 3) ,rep("Psico" , 3) ,rep("Scient" , 3))
+valori <- c(4.93921,17.62918,1.139818,6.188209,19.84621,1.061882,3.880804,17.04782,1.386001,5.728468,26.26778,1.770861,8.452722,24.40306,0.6685769,5.124451,32.15227,1.581259,8.902859,4.197931,1.257351,3.682978,23.28214,1.483602,19.42949,9.903122,0.16146,9.764036,21.56225,1.491728,10.35475,19.42949,1.00671,12.19512,2.71673,0.2173388,11.02581,14.30905,1.290428,11.34163,30.01383,1.659751,4.110136,25.25938,0.957701)
+Proseguo <- rep(c("Master" , "Magistrale" , "Stage") , 15)
+data0 <- data.frame(Tipologia_di_Laurea,Proseguo,valori)
+ggplot(data0, aes(fill=Proseguo,x=reorder(Tipologia_di_Laurea,-valori), y=valori)) + 
+    geom_bar(position="stack", stat="identity") + 
+  theme(plot.title = element_text(hjust=0.5),
+        axis.title = element_text(size=12, face="bold"), 
+        axis.text.x = element_text(size=12),legend.position = "bottom") +
+  ggtitle("Proseguo dalla Laurea") + xlab("Corso di Laurea") +
+  ylab("Percentuale")+ggsave("Nuovo grafico.pdf")
+
+
+
+  #decidere se nella riga inserire position= dodge oppure position=fill
+```
+
+```{r setup, include=TRUE}
+#CALCOLO DELLE PERCENTUALI DI OCCUPAZIONE DEI CORSI A 6, 18 E 36 MESI 
+#OCCUPAZIONE DOPO 6, 18 e 36 MESI
+
+
+SMesiDis=Scientifico[complete.cases(Scientifico[ , 77]),]
+PsiMesiDis=Psicologico[complete.cases(Psicologico[ , 77]),]
+PolMesiDis=Politico_Sociale[complete.cases(Politico_Sociale[ , 77]),]
+MMesiDis=Medico[complete.cases(Medico[ , 77]),]
+LinMesiDis=Linguistico[complete.cases(Linguistico[ , 77]),]
+LetMesiDis=Letterario[complete.cases(Letterario[ , 77]),]
+InsMesiDis=Insegnamento[complete.cases(Insegnamento[ , 77]),]
+IngMesiDis=Ingegneria[complete.cases(Ingegneria[ , 77]),]
+GiuMesiDis=Giuridico[complete.cases(Giuridico[ , 77]),]
+GeoMesiDis=Geo_Biologico[complete.cases(Geo_Biologico[ , 77]),]
+EdMesiDis=EducazioneFisica[complete.cases(EducazioneFisica[ , 77]),]
+CMesiDis=Chimico_Faramceutico[complete.cases(Chimico_Faramceutico[ , 77]),]
+ArMesiDis=Architettura[complete.cases(Architettura[ , 77]),]
+AgMesiDis=Agrario[complete.cases(Agrario[ , 77]),]
+EcoMesiDis=Economico_Statistico[complete.cases(Economico_Statistico[ , 77]),]
+
+
+
+Occ6S=(nrow(select(filter(SMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Scientifico))
+Occ18S=(nrow(select(filter(SMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Scientifico))
+Occ36S=(nrow(select(filter(SMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Scientifico))
+
+Occ6Psi=(nrow(select(filter(PsiMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Psicologico))
+Occ18Psi=(nrow(select(filter(PsiMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Psicologico))
+Occ36Psi=(nrow(select(filter(PsiMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Psicologico))
+
+Occ6Pol=(nrow(select(filter(PolMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Politico_Sociale))
+Occ18Pol=(nrow(select(filter(PolMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Politico_Sociale))
+Occ36Pol=(nrow(select(filter(PolMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Politico_Sociale))
+
+Occ6Med=(nrow(select(filter(MMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Medico))
+Occ18Med=(nrow(select(filter(MMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Medico))
+Occ36Med=(nrow(select(filter(MMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Medico))
+
+Occ6Lin=(nrow(select(filter(LinMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Linguistico))
+Occ18Lin=(nrow(select(filter(LinMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Linguistico))
+Occ36Lin=(nrow(select(filter(LinMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Linguistico))
+
+Occ6Let=(nrow(select(filter(LetMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Letterario))
+Occ18Let=(nrow(select(filter(LetMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Letterario))
+Occ36Let=(nrow(select(filter(LetMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Letterario))
+
+Occ6Ins=(nrow(select(filter(InsMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Insegnamento))
+Occ18Ins=(nrow(select(filter(InsMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Insegnamento))
+Occ36Ins=(nrow(select(filter(InsMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Insegnamento))
+
+Occ6Ing=(nrow(select(filter(IngMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Ingegneria))
+Occ18Ing=(nrow(select(filter(IngMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Ingegneria))
+Occ36Ing=(nrow(select(filter(IngMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Ingegneria))
+
+Occ6Giu=(nrow(select(filter(GiuMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Giuridico))
+Occ18Giu=(nrow(select(filter(GiuMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Giuridico))
+Occ36Giu=(nrow(select(filter(GiuMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Giuridico))
+
+Occ6Geo=(nrow(select(filter(GeoMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Geo_Biologico))
+Occ18Geo=(nrow(select(filter(GeoMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Geo_Biologico))
+Occ36Geo=(nrow(select(filter(GeoMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Geo_Biologico))
+
+Occ6Ed=(nrow(select(filter(EdMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(EducazioneFisica))
+Occ18Ed=(nrow(select(filter(EdMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(EducazioneFisica))
+Occ36Ed=(nrow(select(filter(EdMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(EducazioneFisica))
+
+Occ6Chi=(nrow(select(filter(CMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Chimico_Faramceutico))
+Occ18Chi=(nrow(select(filter(CMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Chimico_Faramceutico))
+Occ36Chi=(nrow(select(filter(CMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Chimico_Faramceutico))
+
+Occ6Ar=(nrow(select(filter(ArMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Architettura))
+Occ18Ar=(nrow(select(filter(ArMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Architettura))
+Occ36Ar=(nrow(select(filter(ArMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Architettura))
+
+Occ6Ag=(nrow(select(filter(AgMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Agrario))
+Occ18Ag=(nrow(select(filter(AgMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Agrario))
+Occ36Ag=(nrow(select(filter(AgMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Agrario))
+
+Occ6Eco=(nrow(select(filter(EcoMesiDis, mesi_I_lavoro <= 6),c(1:78)))/nrow(Economico_Statistico))
+Occ18Eco=(nrow(select(filter(EcoMesiDis, mesi_I_lavoro <= 18),c(1:78)))/nrow(Economico_Statistico))
+Occ36Eco=(nrow(select(filter(EcoMesiDis, mesi_I_lavoro <= 36),c(1:78)))/nrow(Economico_Statistico))
+
+```
+
+```{r, fig.height=6, fig.width=12}
+library(ggplot2)
+library(ggthemes)
+
+# per 6 mesi
+data66 <- data.frame(
+  Corso=c("Agrario","Architettura","Chimico-Farmaceutico	","Economico-Statistico	","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico","Agrario","Architettura","Chimico-Farmaceutico	","Economico-Statistico	","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico") ,  
+  Percentuale=c(Occ6Ag,Occ6Ar,Occ6Chi,Occ6Eco,Occ6Ed,Occ6Geo,Occ6Giu,Occ6Ing,Occ6Ins,Occ6Let,Occ6Lin,Occ6Med,Occ6Pol,Occ6Psi,Occ6S,(1-Occ6Ag), (1-Occ6Ar),(1-Occ6Chi),(1-Occ6Eco),(1-Occ6Ed),(1-Occ6Geo),(1-Occ6Giu),(1-Occ6Ing),(1-Occ6Ins),(1-Occ6Let),(1-Occ6Lin),(1-Occ6Med),(1-Occ6Pol),(1-Occ6Psi),(1-Occ6S)),
+  Stato=c("Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato")
+  )
+
+
+ggplot(data66, aes(data66$Corso, data66$Percentuale, fill=Stato )) + geom_bar(stat="identity")+
+  ggtitle("Occupazione a 6 Mesi") + xlab("Corso di Laurea") +
+  ylab("Percentuale") + scale_y_continuous(labels=scales::percent)+
+  scale_fill_discrete(name="Stato", breaks=c("Occupato", "Non Occupato"),
+                      labels=c("Occupato", "Non Occupato"))+
+  geom_text(aes(label=paste0(round(data66$Percentuale*100,1),"%")),position=position_stack(vjust=0.5),colour="white",size=4)+
+  theme_economist() +
+  theme(plot.title = element_text(hjust=0.5),
+        axis.title = element_text(size=12, face="bold"), 
+        axis.text.x = element_text(size=12),legend.position = "bottom")+
+  coord_flip()
+
+```
+
+```{r, fig.height=6, fig.width=12}
+#per 18 mesi
+
+data188 <- data.frame(
+  Corso=c("Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico","Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico") ,  
+  Percentuale=c(Occ18Ag,Occ18Ar,Occ18Chi,Occ18Eco,Occ18Ed,Occ18Geo,Occ18Giu,Occ18Ing,Occ18Ins,Occ18Let,Occ18Lin,Occ18Med,Occ18Pol,Occ18Psi,Occ18S,(1-Occ18Ag), (1-Occ18Ar),(1-Occ18Chi),(1-Occ18Eco),(1-Occ18Ed),(1-Occ18Geo),(1-Occ18Giu),(1-Occ18Ing),(1-Occ18Ins),(1-Occ18Let),(1-Occ18Lin),(1-Occ18Med),(1-Occ18Pol),(1-Occ18Psi),(1-Occ18S)),
+  Stato=c("Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato"))
+  
+ggplot(data188, aes(x=reorder(data188$Corso, -data188$Percentuale), y=data188$Percentuale, fill=Stato )) + geom_bar(stat="identity")+
+  ggtitle("Occupazione a 18 Mesi") + xlab("Corso di Laurea") +
+  ylab("Percentuale") + scale_y_continuous(labels=scales::percent)+
+  scale_fill_discrete(name="Stato", breaks=c("Occupato", "Non Occupato"),
+                      labels=c("Occupato", "Non Occupato"))+
+  geom_text(aes(label=paste0(round(data188$Percentuale*100,1),"%")),position=position_stack(vjust=0.5),colour="white",size=4)+
+  theme_economist() +
+  theme(plot.title = element_text(hjust=0.5),
+        axis.title = element_text(size=12, face="bold"), 
+        axis.text.x = element_text(size=12),legend.position = "bottom")+
+  coord_flip()
+
+
+```
+
+```{r, fig.height=6, fig.width=12}
+# per 36 mesi
+
+data366 <- data.frame(
+  Corso=c("Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico","Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico") ,  
+  Percentuale=c(Occ36Ag,Occ36Ar,Occ36Chi,Occ36Eco,Occ36Ed,Occ36Geo,Occ36Giu,Occ36Ing,Occ36Ins,Occ36Let,Occ36Lin,Occ36Med,Occ36Pol,Occ36Psi,Occ36S,(1-Occ36Ag), (1-Occ36Ar),(1-Occ36Chi),(1-Occ36Eco),(1-Occ36Ed),(1-Occ36Geo),(1-Occ36Giu),(1-Occ36Ing),(1-Occ36Ins),(1-Occ36Let),(1-Occ36Lin),(1-Occ36Med),(1-Occ36Pol),(1-Occ36Psi),(1-Occ36S)),
+  Stato=c("Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato","Non Occupato"))
+
+
+ggplot(data366, aes(x=reorder(data366$Corso,-data366$Percentuale), y=data366$Percentuale, fill=Stato )) + geom_bar(stat="identity")+
+  ggtitle("Occupazione a 36 Mesi") + xlab("Corso di Laurea") +
+  ylab("Percentuale") + scale_y_continuous(labels=scales::percent)+
+  scale_fill_discrete(name="Stato", breaks=c("Occupato", "Non Occupato"),
+                      labels=c("Occupato", "Non Occupato"))+
+  geom_text(aes(label=paste0(round(data366$Percentuale*100,1),"%")),position=position_stack(vjust=0.5),colour="white",size=4)+
+  theme_economist() +
+  theme(plot.title = element_text(hjust=0.5),
+        axis.title = element_text(size=12, face="bold"), 
+        axis.text.x = element_text(size=12),legend.position = "bottom")+
+  coord_flip()
+
+```
+
+
+```{r,,fig.height=6, fig.width=12}
+#PERCENTUALE DI STUDENTI CHE TROVANO OCCUPAZIONE PRIMA DI LAUREARSI
+PerAgr = jAg /length(Agrario$GRUPPO_mIcro)
+PerArc = jAr/length(Architettura$GRUPPO_mIcro)
+PerChi = jCh/length(Chimico_Faramceutico$GRUPPO_mIcro)
+PerEco = jec/length(Economico_Statistico$GRUPPO_mIcro)
+PerEd = jEd/length(EducazioneFisica$GRUPPO_mIcro)
+PerGeo = jgeo/length(Geo_Biologico$GRUPPO_mIcro)
+PerGiu = jgiu/length(Giuridico$GRUPPO_mIcro)
+PerIng = jIng/length(Ingegneria$GRUPPO_mIcro)
+PerIns = jins/length(Insegnamento$GRUPPO_mIcro)
+PerLet = jlet/length(Letterario$GRUPPO_mIcro)
+PerLin = jlin/length(Linguistico$GRUPPO_mIcro)
+PerMed = jmed/length(Medico$GRUPPO_mIcro)
+PerPol = jpol/length(Politico_Sociale$GRUPPO_mIcro)
+PerPsi = jpsi/length(Psicologico$GRUPPO_mIcro)
+PerSci = jsci/length(Scientifico$GRUPPO_mIcro)
+
+
+CorsoPer=c("Agrario","Architettura","Chimico-Farmaceutico","Economico-Statistico","Educazione Fisica","Geo-Biologico","Giuridico","Ingegneria","Insegnamento","Letterario","Linguistico","Medico","Politico-Sociale","Psicologico","Scientifico")
+Perc = c(PerAgr,PerArc,PerChi,PerEco,PerEd,PerGeo,PerGiu,PerIng,PerIns,PerLet,PerLin,PerMed,PerPol,PerPsi,PerSci)
+
+DataPerc = data.frame(CorsoPer,Perc)
+
+```
+```{r}
+# Plot
+ggplot(DataPerc, aes(x=reorder(CorsoPer, -Perc), y=Perc)) + 
+  geom_point(size=2) + 
+  geom_segment(aes(x=CorsoPer, 
+                   xend=CorsoPer, 
+                   y=0, 
+                   yend=Perc)) + 
+  labs(title="Percentuale di Studenti che trovano lavoro prima di laurearsi") + 
+geom_point( size=4, color="Orange") +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle=90, vjust=0.6)) +xlab("Corso di Laurea") +
+  ylab("Percentuale")
+
+```
+
+```{r}
+#TEST DI IPOTESI: VIENE PRESA CASUALEMENTE COME CLASSE DI LAUREA ECONOMIA E STATITICA E VIENE CONFRONTATA CON LE CLASSI: AGRARIO, MEDICO E SCIENTIFICO PER LE VARIABILI: DURATA STUDI, REDDITO, MESI LAVORO.  
+#TEST DI IPOTESI DURATA STUDI
+library(BSDA)
+z.test(InserimentoLau2$durata_studi, sigma.x=var(InserimentoLau2$durata_studi), mu=3, conf=0.95)
+
+z.test(Economico_Statistico$durata_studi,Agrario$durata_studi, sigma.x=var(Economico_Statistico$durata_studi), sigma.y=Agrario$durata_studi, conf=0.95)
+
+z.test(Economico_Statistico$durata_studi, Medico$durata_studi, sigma.x=var(Economico_Statistico$durata_studi), sigma.y=Medico$durata_studi, conf=0.95)
+
+z.test(Economico_Statistico$durata_studi, Scientifico$durata_studi, sigma.x=var(Economico_Statistico$durata_studi), sigma.y=Scientifico$durata_studi, conf=0.95)
+```
+
+``` {r}
+#su reddito
+#z.test(InserimentoLau2$REDDITO_MFR, sigma.x=var_reddito, mu=1500, conf=0.5)
+
+z.test(Economico_Statistico$REDDITO_MFR, Agrario$REDDITO_MFR, sigma.x=var(Economico_Statistico$REDDITO_MFR), sigma.y=Agrario$REDDITO_MFR, conf=0.95)
+
+z.test(Economico_Statistico$REDDITO_MFR, Medico$REDDITO_MFR, sigma.x=var(Economico_Statistico$REDDITO_MFR),sigma.y=Agrario$REDDITO_MFR, conf=0,95)
+
+z.test(Economico_Statistico$REDDITO_MFR, Scientifico$REDDITO_MFR, sigma.x = var(Economico_Statistico$REDDITO_MFR), sigma.y=Scientifico$REDDITO_MFR, conf=0.95)
+```
+
+```{r}
+#su tempistica della prima occupazione 
+#utilizzata la tabella economia_mesilavoro contenente solo valori maggiori uguali a zero escludendo gli NA e il -1 che indica ch el'inidividuo lavorava già durante il periodo di studi 
+z.test(eco_mesilavoro$mesi_I_lavoro, agrario_mesilavoro$mesi_I_lavoro, sigma.x=var(eco_mesilavoro$mesi_I_lavoro), sigma.y = agrario_mesilavoro$mesi_I_lavoro, conf=0.95)
+
+z.test(eco_mesilavoro$mesi_I_lavoro, medico_mesilavoro$mesi_I_lavoro, sigma.x=var(eco_mesilavoro$mesi_I_lavoro), sigma.y=medico_mesilavoro$mesi_I_lavoro, conf=0.95)
+
+z.test(eco_mesilavoro$mesi_I_lavoro, scienze_mesilavoro$mesi_I_lavoro, sigma.x=var(eco_mesilavoro$mesi_I_lavoro), sigma.y=scienze_mesilavoro$mesi_I_lavoro, conf=0.95)
+
+```
+```{r,fig.height=8, fig.width=8}
+#VISUALIZZAZIONE GRAFICA DELLA CARTINA ITALIANA, PRIMA PER VEDERE LA QUANTITà DI STUDENTI PER REGIONE, POI PER VISUALIZZARE LE REGIONI IN CUI I NEOLAUREATI TROVANO IL LORO PRIMO LAVORO
+Numero <- data.frame(
+    Region = c("Piemonte","Valle d'Aosta","Lombardia", "Trentino-Alto Adige",	"Veneto	","Friuli-Venezia Giulia","Liguria", "Emilia-Romagna","Toscana","Umbria","Marche","Lazio","Abruzzo","Molise","Campania","Puglia","Basilicata","Calabria","Sicilia","Sardegna"),
+    Numerosità_regioni= c(length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==1)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==2)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==3)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==4)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==5)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==6)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==7)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==8)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==9)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==10)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==11)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==12)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==13)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==14)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==15)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==16)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==17)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==18)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==19)),
+length(which(InsProLau_Microdati_Anno_2015$REG_UNI_mIcro==20)))
+ )
+
+library(devtools)
+install_github("quantide/mapIT")
+library(mapIT)
+gp <- list(guide.label="Numero\nStudenti", low="white", high="Black") 
+mapIT(Numerosità_regioni,Region, data=Numero, graphPar = gp)
+
+```
+```{r,fig.height=8, fig.width=8}
+Numero <- data.frame(
+    Region = c("Piemonte","Valle d'Aosta","Lombardia", "Trentino-Alto Adige",	"Veneto	","Friuli-Venezia Giulia","Liguria", "Emilia-Romagna","Toscana","Umbria","Marche","Lazio","Abruzzo","Molise","Campania","Puglia","Basilicata","Calabria","Sicilia","Sardegna"),
+    Numerosità_regioni= c(length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==1)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==2)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==3)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==4)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==5)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==6)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==7)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==8)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==9)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==10)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==11)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==12)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==13)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==14)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==15)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==16)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==17)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==18)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==19)),
+length(which(InsProLau_Microdati_Anno_2015$REG_O_STATO_LAV_mIcro==20)))
+ )
+
+
+library(devtools)
+install_github("quantide/mapIT")
+library(mapIT)
+gpl <- list(guide.label="Numero\nStudenti\nChe\nTrovano Lavoro", low="white", high="Black") 
+mapIT(Numerosità_regioni,Region, data=Numero, graphPar = gpl)
+```
+```{r}
+#ing-sci
+z.test(Ingegneria$durata_studi, Scientifico$durata_studi,alternative="greater",
+sigma.x=var(Ingegneria$durata_studi), sigma.y=var(Scientifico$durata_studi), conf=0.95)
+
+#ing-eco
+z.test(Ingegneria$durata_studi, Economico_Statistico$durata_studi,
+alternative="greater",sigma.x=var(Ingegneria$durata_studi),
+sigma.y=var(Economico_Statistico$durata_studi), conf=0.95)
+
+#chi-sci
+z.test(Chimico_Faramceutico$durata_studi, Scientifico$durata_studi,alternative="greater",
+sigma.x=var(Chimico_Faramceutico$durata_studi), sigma.y=var(Scientifico$durata_studi), conf=0.95)
+
+#let-psi
+z.test(Letterario$durata_studi, Psicologico$durata_studi,alternative="greater",
+sigma.x=var(Letterario$durata_studi), sigma.y=var(Psicologico$durata_studi), conf=0.95)
+
+#let-pol
+z.test(Letterario$durata_studi,Politico_Sociale$durata_studi,
+alternative="greater",sigma.x=var(Letterario$durata_studi), sigma.y=var(Politico_Sociale$durata_studi),
+conf=0.95)
+```
